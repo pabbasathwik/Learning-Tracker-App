@@ -269,7 +269,7 @@ body {
   max-width: 700px;
   margin: 30px auto;
   background: white;
-  padding: 30px;
+  padding: 40px;
   border-radius: 14px;
   box-shadow: 0 12px 30px rgba(0,0,0,0.1);
 }
@@ -361,7 +361,7 @@ body {
 }
 
 /* Add Learning Button */
-.add-learning-btn {
+.add-learning-btn1 {
   padding: 12px 18px;
   background: #16a34a;
   color: white;
@@ -372,6 +372,20 @@ body {
   cursor: pointer;
   box-shadow: 0 6px 16px rgba(0,0,0,0.15);
 }
+
+.add-learning-btn2 {
+  padding: 12px 18px;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  margin-left: auto;
+}
+
 
 .add-learning-btn:hover {
   background: #15803d;

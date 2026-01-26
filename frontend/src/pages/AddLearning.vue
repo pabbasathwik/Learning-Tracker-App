@@ -72,9 +72,6 @@
 
     </form>
     <!-- ✅ FORM END -->
-  <button class="back-link2" @click="$router.push('/dashboard')">
-        ← Back to Dashboard
-      </button>
   </div>
 </template>
 

@@ -7,13 +7,7 @@
     <div class="list-header-left">
       <h2>Daily Learning History</h2>
     </div>
-
-    <button class="add-learning-btn" @click="goToAdd">
-      + Add Learning
-    </button>
   </div>
-
-
 
     <div class="learning-table">
       <table>
@@ -23,6 +17,7 @@
             <th>Session</th>
             <th>Topic</th>
             <th>Time (hrs)</th>
+            <th>Description</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -33,6 +28,7 @@
             <td>{{ item.session }}</td>
             <td>{{ item.topic }}</td>
             <td>{{ item.timeSpent }}</td>
+            <td>{{ item.description }}</td>
             <td>
               <button class="edit-btn" @click="editLearning(item)">
                 Edit
@@ -50,9 +46,6 @@
       </table>
     </div>
   </div>
-    <button class="back-link1" @click="$router.push('/dashboard')">
-        ← Back to Dashboard
-      </button>
 </template>
 
 <script setup>
