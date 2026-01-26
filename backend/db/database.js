@@ -7,20 +7,19 @@ const db = await open({
   driver: sqlite3.Database
 });
 
-/* Create learning table */
+/* USERS table (Auth) */
 await db.exec(`
-  CREATE TABLE IF NOT EXISTS learning (
+  CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    date TEXT NOT NULL,
-    session TEXT NOT NULL,
-    topic TEXT NOT NULL,
-    description TEXT NOT NULL,
-    timeSpent REAL NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL,
+    role TEXT DEFAULT 'intern',
     createdAt TEXT NOT NULL
   )
 `);
 
-/* Create users table */
+/* LEARNING table (User-based learning) */
 await db.exec(`
   CREATE TABLE IF NOT EXISTS learning (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,10 +29,11 @@ await db.exec(`
     topic TEXT NOT NULL,
     description TEXT NOT NULL,
     timeSpent REAL NOT NULL,
-    createdAt TEXT NOT NULL
+    createdAt TEXT NOT NULL,
+    FOREIGN KEY (userId) REFERENCES users(id)
   )
 `);
 
-
 export default db;
+cd 
 

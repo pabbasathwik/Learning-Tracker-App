@@ -4,76 +4,6 @@ import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-/* GET all learning */
-router.get("/", async (req, res) => {
-  const rows = await db.all(
-    "SELECT * FROM learning ORDER BY id DESC"
-  );
-  res.json(rows);
-});
-
-/* GET by ID */
-router.get("/:id", async (req, res) => {
-  const row = await db.get(
-    "SELECT * FROM learning WHERE id = ?",
-    req.params.id
-  );
-
-  if (!row) {
-    return res.status(404).json({ message: "Not found" });
-  }
-
-  res.json(row);
-});
-
-/* CREATE */
-router.post("/", async (req, res) => {
-  const { date, session, topic, description, timeSpent } = req.body;
-
-  const result = await db.run(
-    `INSERT INTO learning 
-     (date, session, topic, description, timeSpent, createdAt)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    date,
-    session,
-    topic,
-    description,
-    timeSpent,
-    new Date().toISOString()
-  );
-
-  res.json({ id: result.lastID });
-});
-
-/* UPDATE */
-router.put("/:id", async (req, res) => {
-  const { date, session, topic, description, timeSpent } = req.body;
-
-  await db.run(
-    `UPDATE learning
-     SET date = ?, session = ?, topic = ?, description = ?, timeSpent = ?
-     WHERE id = ?`,
-    date,
-    session,
-    topic,
-    description,
-    timeSpent,
-    req.params.id
-  );
-
-  res.json({ success: true });
-});
-
-/* DELETE */
-router.delete("/:id", async (req, res) => {
-  await db.run(
-    "DELETE FROM learning WHERE id = ?",
-    req.params.id
-  );
-
-  res.json({ success: true });
-});
-
 /* GET user learning */
 router.get("/", authMiddleware, async (req, res) => {
   const rows = await db.all(
@@ -83,7 +13,19 @@ router.get("/", authMiddleware, async (req, res) => {
   res.json(rows);
 });
 
-/* CREATE learning */
+/* GET by ID */
+router.get("/:id", authMiddleware, async (req, res) => {
+  const row = await db.get(
+    "SELECT * FROM learning WHERE id = ? AND userId = ?",
+    req.params.id,
+    req.user.id
+  );
+
+  if (!row) return res.status(404).json({ message: "Not found" });
+  res.json(row);
+});
+
+/* CREATE */
 router.post("/", authMiddleware, async (req, res) => {
   const { date, session, topic, description, timeSpent } = req.body;
 
@@ -98,6 +40,37 @@ router.post("/", authMiddleware, async (req, res) => {
     description,
     timeSpent,
     new Date().toISOString()
+  );
+
+  res.json({ success: true });
+});
+
+/* UPDATE */
+router.put("/:id", authMiddleware, async (req, res) => {
+  const { date, session, topic, description, timeSpent } = req.body;
+
+  await db.run(
+    `UPDATE learning
+     SET date=?, session=?, topic=?, description=?, timeSpent=?
+     WHERE id=? AND userId=?`,
+    date,
+    session,
+    topic,
+    description,
+    timeSpent,
+    req.params.id,
+    req.user.id
+  );
+
+  res.json({ success: true });
+});
+
+/* DELETE */
+router.delete("/:id", authMiddleware, async (req, res) => {
+  await db.run(
+    "DELETE FROM learning WHERE id=? AND userId=?",
+    req.params.id,
+    req.user.id
   );
 
   res.json({ success: true });

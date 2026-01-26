@@ -3,11 +3,12 @@ import jwt from "jsonwebtoken";
 const JWT_SECRET = "intern_learning_secret";
 
 export function authMiddleware(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
-
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
+  const header = req.headers.authorization;
+  if (!header) {
+    return res.status(401).json({ message: "No token" });
   }
+
+  const token = header.split(" ")[1];
 
   try {
     req.user = jwt.verify(token, JWT_SECRET);
@@ -16,3 +17,4 @@ export function authMiddleware(req, res, next) {
     res.status(401).json({ message: "Invalid token" });
   }
 }
+

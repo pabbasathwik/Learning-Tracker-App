@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import db from "../db/database.js";
 
 const router = express.Router();
-const JWT_SECRET = "intern_learning_secret"; // move to env later
+const JWT_SECRET = "intern_learning_secret";
 
 /* REGISTER */
 router.post("/register", async (req, res) => {
@@ -17,13 +17,17 @@ router.post("/register", async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, 10);
 
   try {
-    const result = db.prepare(`
-      INSERT INTO users (name, email, password, createdAt)
-      VALUES (?, ?, ?, ?)
-    `).run(name, email, hashedPassword, new Date().toISOString());
+    await db.run(
+      `INSERT INTO users (name, email, password, createdAt)
+       VALUES (?, ?, ?, ?)`,
+      name,
+      email,
+      hashedPassword,
+      new Date().toISOString()
+    );
 
     res.json({ success: true });
-  } catch (err) {
+  } catch {
     res.status(400).json({ message: "Email already exists" });
   }
 });
@@ -32,16 +36,17 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = db
-    .prepare("SELECT * FROM users WHERE email = ?")
-    .get(email);
+  const user = await db.get(
+    "SELECT * FROM users WHERE email = ?",
+    email
+  );
 
   if (!user) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
@@ -63,3 +68,4 @@ router.post("/login", async (req, res) => {
 });
 
 export default router;
+

@@ -62,7 +62,7 @@
       <!-- Time -->
       <div class="form-group">
         <label>Time Spent (in hours)</label>
-        <input type="number" min="0.5" step="0.5" v-model="timeSpent" />
+        <input type="number" min="0.5" step="0.5" v-model="timeSpent" placeholder="Type how many hours you have worked"/>
       </div>
 
       <!-- Submit -->
@@ -88,7 +88,7 @@ import { useValidation } from "../composables/useValidation";
 
 /* Router */
 const router = useRouter();
-
+const route = useRoute();
 /* Store */
 const learningStore = useLearningStore();
 
@@ -114,8 +114,17 @@ const {
 
 /* On page load */
 onMounted(async () => {
-  if (router.query.id) {
-    const existingLearning = await learningStore.getById(route.query.id);
+  if (!route.query.id) return;
+
+  try {
+    const existingLearning = await learningStore.getById(
+      Number(route.query.id)
+    );
+
+    if (!existingLearning) {
+      console.warn("Learning not found");
+      return;
+    }
 
     isEdit.value = true;
     editId.value = existingLearning.id;
@@ -124,8 +133,11 @@ onMounted(async () => {
     topic.value = existingLearning.topic;
     description.value = existingLearning.description;
     timeSpent.value = existingLearning.timeSpent;
+  } catch (err) {
+    console.error("Failed to load learning", err);
   }
 });
+
 
 
 /* Save or Update learning */
