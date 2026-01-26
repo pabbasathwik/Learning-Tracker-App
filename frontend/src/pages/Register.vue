@@ -19,7 +19,10 @@
         <input type="password" v-model="password" placeholder="New Password" autocomplete="new-password"/>
         <p v-if="errors.password" class="error">{{ errors.password }}</p>
 
-        <button @click="register">Create Account</button>
+       <button @click="register" :disabled="loading">
+       {{ loading ? "Creating..." : "Create Account" }}
+       </button>
+
 
         <div class="auth-footer">
           Already have an account?
@@ -44,6 +47,7 @@ const authStore = useAuthStore();
 const name = ref("");
 const email = ref("");
 const password = ref("");
+const loading = ref(false);
 
 /* Validation */
 const { errors, clearErrors, isRequired, minLength, isEmail } = useValidation();
@@ -64,6 +68,8 @@ async function register() {
 
   if (!valid) return;
 
+  loading.value = true;
+
   try {
     await authStore.register({
       name: name.value,
@@ -74,8 +80,10 @@ async function register() {
     alert("Registration successful. Please login.");
     router.push("/login");
   } catch (err) {
+    console.error("Register error:", err);
     alert(err?.response?.data?.message || "Registration failed");
+  } finally {
+    loading.value = false;
   }
 }
 </script>
-

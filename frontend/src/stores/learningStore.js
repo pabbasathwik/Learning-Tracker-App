@@ -1,48 +1,37 @@
 import { defineStore } from "pinia";
-import axios from "axios";
-
-const API_URL = "http://localhost:5000/api/learning";
+import api from "../services/api";
 
 export const useLearningStore = defineStore("learning", {
   state: () => ({
-    learnings: [],
-    loading: false
+    learnings: []
   }),
 
   actions: {
-    // GET ALL
     async fetchLearnings() {
-      this.loading = true;
-      try {
-        const res = await axios.get(API_URL);
-        this.learnings = res.data;
-      } finally {
-        this.loading = false;
-      }
+      const res = await api.get("/learning");
+      this.learnings = res.data;
     },
 
-    // GET BY ID
-    async getById(id) {
-      const res = await axios.get(`${API_URL}/${id}`);
-      return res.data;
-    },
-
-    // ADD
     async addLearning(data) {
-      await axios.post(API_URL, data);
+      await api.post("/learning", data);
       await this.fetchLearnings();
     },
 
-    // UPDATE
     async updateLearning(id, data) {
-      await axios.put(`${API_URL}/${id}`, data);
+      await api.put(`/learning/${id}`, data);
       await this.fetchLearnings();
     },
 
-    // DELETE
     async deleteLearning(id) {
-      await axios.delete(`${API_URL}/${id}`);
+      await api.delete(`/learning/${id}`);
       await this.fetchLearnings();
+    },
+
+    async getById(id) {
+      if (this.learnings.length === 0) {
+        await this.fetchLearnings();
+      }
+      return this.learnings.find(l => l.id === id);
     }
   }
 });

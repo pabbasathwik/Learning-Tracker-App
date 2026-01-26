@@ -15,7 +15,10 @@
         <input type="password" v-model="password" placeholder="password" autocomplete="new-password"/>
         <p v-if="errors.password" class="error">{{ errors.password }}</p>
 
-        <button @click="login">Sign In</button>
+        <button @click="login" :disabled="loading">
+        {{ loading ? "Signing in..." : "Sign In" }}
+        </button>
+
 
         <div class="auth-footer">
           Don’t have an account?
@@ -31,17 +34,19 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import AuthHeader from "../components/AuthHeader.vue";
 import { useValidation } from "../composables/useValidation";
+import { useAuthStore } from "../stores/authStore";
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const email = ref("");
 const password = ref("");
+const loading = ref(false);
 
 const { errors, clearErrors, isRequired, isEmail } = useValidation();
 
-function login() {
+async function login() {
   clearErrors();
-
   let valid = true;
 
   if (!isRequired(email.value, "email") || !isEmail(email.value, "email"))
@@ -52,6 +57,18 @@ function login() {
 
   if (!valid) return;
 
-  router.push("/dashboard");
+  loading.value = true;
+  try {
+    await authStore.login({
+      email: email.value,
+      password: password.value
+    });
+
+    router.push("/dashboard");
+  } catch (err) {
+    alert(err?.response?.data?.message || "Login failed");
+  } finally {
+    loading.value = false;
+  }
 }
 </script>

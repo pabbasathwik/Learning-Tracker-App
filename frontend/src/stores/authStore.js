@@ -1,7 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "axios";
-
-const API = "http://localhost:5000/api/auth";
+import api from "../services/api";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -11,25 +9,24 @@ export const useAuthStore = defineStore("auth", {
 
   actions: {
     async register(data) {
-      await axios.post(`${API}/register`, data);
+      await api.post("/auth/register", data);
     },
 
     async login(data) {
-      const res = await axios.post(`${API}/login`, data);
+      const res = await api.post("/auth/login", data);
+
       this.token = res.data.token;
       this.user = res.data.user;
 
       localStorage.setItem("token", this.token);
-      axios.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${this.token}`;
+      api.defaults.headers.common.Authorization = `Bearer ${this.token}`;
     },
 
     logout() {
       this.user = null;
       this.token = null;
-      localStorage.removeItem("token");
-      delete axios.defaults.headers.common["Authorization"];
+      localStorage.clear();
+      delete api.defaults.headers.common.Authorization;
     }
   }
 });

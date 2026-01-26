@@ -90,7 +90,8 @@ const route = useRoute();
 const learningStore = useLearningStore();
 
 /* Form fields */
-const date = ref(new Date().toISOString().substring(0, 10));
+const today = new Date();
+const date = ref(today.toISOString().split("T")[0]);
 const session = ref("Morning");
 const topic = ref("");
 const description = ref("");

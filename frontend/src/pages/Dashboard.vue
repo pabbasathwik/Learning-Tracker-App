@@ -4,7 +4,7 @@
   <div class="dashboard">
     <!-- Welcome -->
     <div class="dashboard-header">
-      <h2>Welcome, {{ store1.user?.name }}👋</h2>
+      <h2>Welcome, User👋</h2>
       <p>Here’s a quick overview of your internship progress</p>
     </div>
 
