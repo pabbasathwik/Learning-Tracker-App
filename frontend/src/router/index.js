@@ -1,17 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import Login from "../pages/Login.vue";
-import Register from "../pages/Register.vue";
-import Dashboard from "../pages/Dashboard.vue";
-import AddLearning from "../pages/AddLearning.vue";
-import LearningList from "../pages/LearningList.vue"; 
 
 const routes = [
   { path: "/", redirect: "/login" },
-  { path: "/login", component: Login },
-  { path: "/register", component: Register },
-  { path: "/dashboard", component: Dashboard },
-  { path: "/add-learning", component: AddLearning },
-  {path : "/learning-list", component: LearningList }
+  { path: "/login", name : 'Login',component: () => import('../views/Login.vue')},
+  { path: "/register", name: 'Register', component: () => import('../views/Register.vue')},
+  { path: "/dashboard", name : 'Dashboard',component: () => import('../views/Dashboard.vue')},
+  { path: "/add-learning", name : 'AddLearning',component: () => import('../views/AddLearning.vue')},
+  {path : "/learning-list", name : 'LearningList',component: () => import('../views/LearningList.vue')},
 ];
 
 const router = createRouter({
