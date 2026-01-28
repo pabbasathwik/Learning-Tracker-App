@@ -1,46 +1,40 @@
 import express from "express";
-import db from "../db/database.js";
+import { pool } from "../db/database.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-/* GET user learning */
+/* GET */
 router.get("/", authMiddleware, async (req, res) => {
-  const rows = await db.all(
-    "SELECT * FROM learning WHERE userId = ? ORDER BY id DESC",
-    req.user.id
-  );
-  res.json(rows);
-});
+  const result = await pool.request()
+    .input("userId", req.user.id)
+    .query(`
+      SELECT * FROM learning
+      WHERE userId=@userId
+      ORDER BY id DESC
+    `);
 
-/* GET by ID */
-router.get("/:id", authMiddleware, async (req, res) => {
-  const row = await db.get(
-    "SELECT * FROM learning WHERE id = ? AND userId = ?",
-    req.params.id,
-    req.user.id
-  );
-
-  if (!row) return res.status(404).json({ message: "Not found" });
-  res.json(row);
+  res.json(result.recordset);
 });
 
 /* CREATE */
 router.post("/", authMiddleware, async (req, res) => {
   const { date, session, topic, description, timeSpent } = req.body;
 
-  await db.run(
-    `INSERT INTO learning
-     (userId, date, session, topic, description, timeSpent, createdAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    req.user.id,
-    date,
-    session,
-    topic,
-    description,
-    timeSpent,
-    new Date().toISOString()
-  );
+  await pool.request()
+    .input("userId", req.user.id)
+    .input("date", date)
+    .input("session", session)
+    .input("topic", topic)
+    .input("description", description)
+    .input("timeSpent", timeSpent)
+    .input("createdAt", new Date().toISOString())
+    .query(`
+      INSERT INTO learning
+      (userId, date, session, topic, description, timeSpent, createdAt)
+      VALUES
+      (@userId, @date, @session, @topic, @description, @timeSpent, @createdAt)
+    `);
 
   res.json({ success: true });
 });
@@ -49,29 +43,38 @@ router.post("/", authMiddleware, async (req, res) => {
 router.put("/:id", authMiddleware, async (req, res) => {
   const { date, session, topic, description, timeSpent } = req.body;
 
-  await db.run(
-    `UPDATE learning
-     SET date=?, session=?, topic=?, description=?, timeSpent=?
-     WHERE id=? AND userId=?`,
-    date,
-    session,
-    topic,
-    description,
-    timeSpent,
-    req.params.id,
-    req.user.id
-  );
+  await pool.request()
+    .input("id", req.params.id)
+    .input("userId", req.user.id)
+    .input("date", date)
+    .input("session", session)
+    .input("topic", topic)
+    .input("description", description)
+    .input("timeSpent", timeSpent)
+    .query(`
+      UPDATE learning
+      SET
+        date = @date,
+        session = @session,
+        topic = @topic,
+        description = @description,
+        timeSpent = @timeSpent
+      WHERE id = @id AND userId = @userId
+    `);
 
   res.json({ success: true });
 });
 
+
 /* DELETE */
 router.delete("/:id", authMiddleware, async (req, res) => {
-  await db.run(
-    "DELETE FROM learning WHERE id=? AND userId=?",
-    req.params.id,
-    req.user.id
-  );
+  await pool.request()
+    .input("id", req.params.id)
+    .input("userId", req.user.id)
+    .query(`
+      DELETE FROM learning
+      WHERE id=@id AND userId=@userId
+    `);
 
   res.json({ success: true });
 });

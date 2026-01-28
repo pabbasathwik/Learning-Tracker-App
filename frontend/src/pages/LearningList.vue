@@ -30,7 +30,7 @@
             <td>{{ item.timeSpent }}</td>
             <td>{{ item.description }}</td>
             <td>
-              <button class="edit-btn" @click="editLearning(item)">
+              <button class="edit-btn" @click="updateLearning(item)">
                 Edit
               </button>
               <button class="delete-btn" @click="deleteLearning(item.id)">
@@ -66,19 +66,13 @@ const store = useLearningStore();
 /* ✅ Read learning data from Pinia store */
 const learnings = computed(() => store.learnings);
 
-/* Navigate to add page */
-function goToAdd() {
-  router.push("/add-learning");
-}
-
 /* Navigate to edit page */
-function editLearning(item) {
+function updateLearning(item) {
   router.push({
     path: "/add-learning",
     query: { id: item.id }
   });
 }
-
 /* Delete learning (Pinia action) */
 function deleteLearning(id) {
   if (!confirm("Are you sure you want to delete this learning?")) return;

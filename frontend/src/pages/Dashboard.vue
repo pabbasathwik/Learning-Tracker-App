@@ -4,7 +4,7 @@
   <div class="dashboard">
     <!-- Welcome -->
     <div class="dashboard-header">
-      <h2>Welcome, User👋</h2>
+      <h2>Welcome, {{ username }}👋</h2>
       <p>Here’s a quick overview of your internship progress</p>
     </div>
 
@@ -69,15 +69,18 @@ import Navbar from "../components/Navbar.vue";
 import { useLearningStore } from "../stores/learningStore";
 import { useAuthStore } from "../stores/authStore";
 
-
+const username = computed(() => {
+  return Auth.user?.name || "User";
+});
 
 const store = useLearningStore();
-const store1 = useAuthStore();
+const Auth = useAuthStore();
 onMounted(() => {
   store.fetchLearnings();
 });
 
 const totalLearnings = computed(() => store.learnings.length);
+
 const progress = computed(() => {
   if (totalLearnings.value === 0) return 0;
   return Math.min((totalLearnings.value / 10) * 100, 100);

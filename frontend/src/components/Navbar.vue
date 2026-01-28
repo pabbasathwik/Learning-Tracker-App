@@ -15,17 +15,24 @@
 
     <!-- RIGHT: User info & logout -->
     <div class="navbar-right">
-      <span class="user-label">Intern</span>
+      <span class="user-label">{{ username }}</span>
       <button class="logout-btn" @click="logout">Logout</button>
     </div>
   </nav>
 </template>
 
 <script setup>
+import {computed} from "vue";
 import { useRouter, useRoute } from "vue-router";
+import { useAuthStore } from "../stores/authStore";
 
 const router = useRouter();
 const route = useRoute();
+
+const username = computed(() => {
+  const authStore = useAuthStore();
+  return authStore.user?.name || "User";
+});
 
 /* Generic navigation handler */
 function navigate(path) {

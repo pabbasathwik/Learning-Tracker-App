@@ -5,7 +5,7 @@
     <div class="auth-content">
       <div class="auth-card">
         <h2>Login</h2>
-        <p class="auth-subtitle">Welcome back 👋</p>
+        <p class="auth-subtitle">Welcome back, {{ username}}👋</p>
 
         <label>Email</label>
         <input type="email" v-model="email" placeholder="you@example.com" autocomplete="off"/>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import AuthHeader from "../components/AuthHeader.vue";
 import { useValidation } from "../composables/useValidation";
@@ -42,6 +42,11 @@ const authStore = useAuthStore();
 const email = ref("");
 const password = ref("");
 const loading = ref(false);
+
+/* ✅ USERNAME COMPUTED */
+const username = computed(() => {
+  return authStore.user?.name || "User";
+});
 
 const { errors, clearErrors, isRequired, isEmail } = useValidation();
 

@@ -168,6 +168,7 @@ try{
     alert("Learning added successfully!");
   }
 
+
  router.push("/learning-list");
   } catch (err) {
     alert("Failed to save learning. Please try again.");

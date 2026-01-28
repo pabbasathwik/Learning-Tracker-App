@@ -86,4 +86,7 @@ async function register() {
     loading.value = false;
   }
 }
+
+
+
 </script>

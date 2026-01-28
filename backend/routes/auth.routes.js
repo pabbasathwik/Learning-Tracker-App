@@ -1,53 +1,50 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import db from "../db/database.js";
-const JWT_SECRET = "intern_learning_secret";
+import { pool } from "../db/database.js";
 
 const router = express.Router();
-/* Register */
+const JWT_SECRET = "intern_learning_secret";
+
+/* REGISTER */
 router.post("/register", async (req, res) => {
   try {
-    console.log("REGISTER BODY:", req.body);
-
     const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
+    if (!name || !email || !password)
       return res.status(400).json({ message: "All fields required" });
-    }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashed = await bcrypt.hash(password, 10);
 
-    await db.run(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      name,
-      email,
-      hashedPassword
-    );
+    await pool.request()
+      .input("name", name)
+      .input("email", email)
+      .input("password", hashed)
+      .query(`
+        INSERT INTO users (name, email, password)
+        VALUES (@name, @email, @password)
+      `);
 
     res.json({ success: true });
   } catch (err) {
-    console.error("REGISTER ERROR:", err.message);
     res.status(400).json({ message: err.message });
   }
 });
 
-
-/* Login */
+/* LOGIN */
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  const user = await db.get(
-    "SELECT * FROM users WHERE email = ?",
-    email
-  );
+  const result = await pool.request()
+    .input("email", email)
+    .query("SELECT * FROM users WHERE email=@email");
 
+  const user = result.recordset[0];
   if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
   const ok = await bcrypt.compare(password, user.password);
   if (!ok) return res.status(401).json({ message: "Invalid credentials" });
 
-  const token = jwt.sign({ id: user.id }, SECRET, { expiresIn: "1d" });
+  const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1d" });
 
   res.json({
     token,
